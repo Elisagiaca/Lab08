@@ -158,4 +158,6 @@ public class Flight {
 				+ ", destinationAirportId=" + destinationAirportId + "]";
 	}
 
+	
+
 }

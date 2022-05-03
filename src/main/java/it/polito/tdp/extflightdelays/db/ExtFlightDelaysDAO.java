@@ -5,8 +5,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import it.polito.tdp.extflightdelays.model.Airline;
 import it.polito.tdp.extflightdelays.model.Airport;
@@ -91,4 +93,62 @@ public class ExtFlightDelaysDAO {
 			throw new RuntimeException("Error Connection Database");
 		}
 	}
+	
+	
+	public List<Flight> getAeroportoCollegato(Airport partenza, Airport arrivo){
+		List<Flight> lista = new ArrayList<>();
+		
+		String sql = "SELECT * "
+				+ "FROM flights f "
+				+ "WHERE (f.ORIGIN_AIRPORT_ID = ? && f.DESTINATION_AIRPORT_ID=?) || (f.ORIGIN_AIRPORT_ID=? && f.DESTINATION_AIRPORT_ID=?)";
+
+		try {
+			Connection conn = ConnectDB.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+		
+			st.setInt(1, partenza.getId());
+			st.setInt(2, arrivo.getId());
+			
+			st.setInt(3, arrivo.getId());
+			st.setInt(4, partenza.getId());
+			
+			ResultSet rs = st.executeQuery();
+			
+			while (rs.next()) {
+				Flight flight = new Flight(rs.getInt("ID"), rs.getInt("AIRLINE_ID"), rs.getInt("FLIGHT_NUMBER"),
+						rs.getString("TAIL_NUMBER"), rs.getInt("ORIGIN_AIRPORT_ID"),
+						rs.getInt("DESTINATION_AIRPORT_ID"),
+						rs.getTimestamp("SCHEDULED_DEPARTURE_DATE").toLocalDateTime(), rs.getDouble("DEPARTURE_DELAY"),
+						rs.getDouble("ELAPSED_TIME"), rs.getInt("DISTANCE"),
+						rs.getTimestamp("ARRIVAL_DATE").toLocalDateTime(), rs.getDouble("ARRIVAL_DELAY"));
+				lista.add(flight);
+			}
+
+			conn.close();
+			return lista;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Errore connessione al database");
+			throw new RuntimeException("Error Connection Database");
+		}
+	}
+
+
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }
