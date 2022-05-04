@@ -9,6 +9,7 @@ import java.util.ResourceBundle;
 
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.DefaultWeightedEdge;
 
 import it.polito.tdp.extflightdelays.model.Airport;
 import it.polito.tdp.extflightdelays.model.Model;
@@ -45,7 +46,7 @@ public class FXMLController {
     	
     	txtResult.appendText("Vertici= " + model.getGrafo().vertexSet().size()+"\n");
     	txtResult.appendText("Archi= " + model.getGrafo().edgeSet().size()+"\n");
-    	for (DefaultEdge d : model.getGrafo().edgeSet()) {
+    	for (DefaultWeightedEdge d : model.getGrafo().edgeSet()) {
 			txtResult.appendText("Aeroporto partenza: " + model.getGrafo().getEdgeSource(d).getId() + ", aeroporto destinazione: " + model.getGrafo().getEdgeTarget(d).getId() + ", peso: " + model.getGrafo().getEdgeWeight(d)+"\n");
 		}
     	

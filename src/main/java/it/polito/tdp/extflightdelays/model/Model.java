@@ -2,21 +2,19 @@ package it.polito.tdp.extflightdelays.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
-import org.jgrapht.graph.DefaultEdge;
-import org.jgrapht.graph.SimpleGraph;
+import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
+
 
 import it.polito.tdp.extflightdelays.db.ExtFlightDelaysDAO;
 
 public class Model {
-	private Graph<Airport, DefaultEdge> grafo;
+	private Graph<Airport, DefaultWeightedEdge> grafo;
 	
 	
-	public void creaGrafo(int distanzaMinima) {
+	/*public void creaGrafo(int distanzaMinima) {
 		
 		this.grafo = new SimpleWeightedGraph<Airport, DefaultEdge>(DefaultEdge.class);
 		ExtFlightDelaysDAO dao = new ExtFlightDelaysDAO();
@@ -51,13 +49,37 @@ public class Model {
 		System.out.println("Archi= "+this.grafo.edgeSet().size());
 		for (DefaultEdge d : this.grafo.edgeSet()) {
 			System.out.println("Aeroporto partenza: " + this.grafo.getEdgeSource(d).getId() + ", aeroporto destinazione: " + this.grafo.getEdgeTarget(d).getId() + ", peso: " + this.grafo.getEdgeWeight(d));
-		}*/
+		}
+	}*/
+	
+	public void creaGrafo(int distanzaMinima) {
+		
+		this.grafo = new SimpleWeightedGraph<Airport, DefaultWeightedEdge>(DefaultWeightedEdge.class);
+		ExtFlightDelaysDAO dao = new ExtFlightDelaysDAO();
+		List<Airport> listaAeroporti = dao.loadAllAirports();
+		Graphs.addAllVertices(this.grafo, listaAeroporti);
+		
+		List<CoppiaAeroporti> listaAeroportiConnessi = new ArrayList<>();
+		listaAeroportiConnessi.addAll(dao.getAllAeroportiConnessi(distanzaMinima));
+		
+		Airport partenza = null;
+		Airport arrivo = null;
+		
+		for(CoppiaAeroporti coppia :  listaAeroportiConnessi) {
+				for(Airport aeroporto : listaAeroporti) {
+					if (coppia.getPartenza_id()==aeroporto.getId()) {
+						partenza = aeroporto;
+					}
+					else if (coppia.getArrivo_id()==aeroporto.getId()) {
+						arrivo = aeroporto;
+					}
+				}
+				Graphs.addEdge(this.grafo, partenza, arrivo , coppia.getDistanceMedia());
+		}
 	}
 	
 	
-	
-	
-	public Graph<Airport, DefaultEdge> getGrafo() {
+	public Graph<Airport, DefaultWeightedEdge> getGrafo() {
 		return this.grafo;
 	}
 }
